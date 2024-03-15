@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "sharp": "^0.33.3"
+    "node-addon-api": "^8.0.0",
+    "node-gyp": "^10.1.0",
+    "sharp": "^0.32.6"
   }
 }
