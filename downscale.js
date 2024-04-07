@@ -1,14 +1,31 @@
 import sharp from 'sharp';
+import fs from 'fs';
+
+const longestSideSize = 1920;
+
+fs.mkdirSync('./downscaled', { recursive: true });
 
 (async () => {
   const t0 = performance.now();
-  const targetWidth = 1920;
-  const targetHeight = 1080;
-  await sharp('./image.jpg')
-    .resize(targetWidth, targetHeight)
-    .jpeg({ quality: 100 })
-    .withMetadata()
-    .toFile('./image-downscaled.jpg');
+  const inputImage = './input/image.jpg';
+
+  // Remove orientation metadata
+  const buffer = await sharp(inputImage).rotate().toBuffer();
+  const metadata = await sharp(buffer).metadata();
+
+  // Determine the new dimensions while maintaining aspect ratio
+  const width = metadata.width;
+  const height = metadata.height;
+  let newWidth, newHeight;
+  if (width > height) {
+    newWidth = longestSideSize;
+    newHeight = Math.round(height * (longestSideSize / width));
+  } else {
+    newHeight = longestSideSize;
+    newWidth = Math.round(width * (longestSideSize / height));
+  }
+
+  await sharp(buffer).resize(newWidth, newHeight).withMetadata().png({ quality: 80 }).toFile('./downscaled/image.png');
 
   const t1 = performance.now();
   console.log(`Time taken: ${(t1 - t0) / 1000} seconds`);
