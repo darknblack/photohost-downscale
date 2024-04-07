@@ -7,7 +7,7 @@ fs.mkdirSync('./downscaled', { recursive: true });
 
 (async () => {
   const t0 = performance.now();
-  const inputImage = './input/image.jpg';
+  const inputImage = './input/image.JPG';
 
   // Remove orientation metadata
   const buffer = await sharp(inputImage).rotate().toBuffer();
