@@ -1,7 +1,6 @@
 import fs from 'fs/promises';
 import os from 'os';
 import { spawn } from 'child_process';
-import { promisify } from 'util';
 
 const numCores = os.cpus().length;
 const imageDir = './input';
@@ -16,7 +15,11 @@ async function main() {
     await fs.access(imageDir);
     await fs.mkdir(outputDir, { recursive: true });
 
-    const imageList = await fs.readdir(imageDir);
+    const imagesExt = ['.jpg', '.png', '.jpeg', '.gif'];
+    const imageList = (await fs.readdir(imageDir)).filter(file => {
+      const fileExt = file.split('.').pop().toLowerCase();
+      return imagesExt.includes(fileExt);
+    });
     const chunkSize = Math.ceil(imageList.length / numCores);
 
     // Divide image list into chunks
@@ -27,6 +30,7 @@ async function main() {
 
     // Process image chunks in parallel
     const childProcesses = [];
+    let totalProcessed = 0;
 
     for (const imageChunk of imageChunks) {
       const child = spawn('node', ['downscale.js'], {
@@ -45,9 +49,14 @@ async function main() {
 
         // Listen for completion or error messages from child processes
         child.on('message', message => {
-          if (message.status === 'complete') {
-            console.log('Image chunk processed successfully.');
-          } else if (message.status === 'error') {
+          const { status } = message;
+
+          if (status === 'progress') {
+            totalProcessed += 1;
+            console.log(`Progress (${totalProcessed}/${imageList.length}) -> ${message.imagePath}`);
+          }
+
+          if (status === 'error') {
             console.error('Error during image processing:', message.error);
           }
         });
