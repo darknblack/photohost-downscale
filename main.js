@@ -15,7 +15,7 @@ async function main() {
     await fs.access(imageDir);
     await fs.mkdir(outputDir, { recursive: true });
 
-    const imagesExt = ['.jpg', '.png', '.jpeg', '.gif'];
+    const imagesExt = ['jpg', 'png', 'jpeg', 'gif'];
     const imageList = (await fs.readdir(imageDir)).filter(file => {
       const fileExt = file.split('.').pop().toLowerCase();
       return imagesExt.includes(fileExt);
