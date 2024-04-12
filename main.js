@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import os from 'os';
 import { spawn } from 'child_process';
 
-const numCores = os.cpus().length - 2;
+const numCores = os.cpus().length;
 const imageDir = './input';
 const outputDir = './downscaled';
 const targetWidth = 1920;
