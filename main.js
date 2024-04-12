@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import os from 'os';
 import { spawn } from 'child_process';
 
-const numCores = os.cpus().length;
+const numCores = os.cpus().length - 2;
 const imageDir = './input';
 const outputDir = './downscaled';
 const targetWidth = 1920;
@@ -10,6 +10,7 @@ const targetHeight = 1080;
 const targetQuality = 80;
 
 async function main() {
+  const t0 = performance.now();
   try {
     // Validate input and output directories
     await fs.access(imageDir);
@@ -74,6 +75,8 @@ async function main() {
   } catch (error) {
     console.error('Error during downscaling:', error);
   }
+  const t1 = performance.now();
+  console.log(`Total time: ${(t1 - t0) / 1000}s`);
 }
 
 main().catch(error => {
