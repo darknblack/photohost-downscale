@@ -34,11 +34,11 @@ async function main() {
     let totalProcessed = 0;
 
     for (const imageChunk of imageChunks) {
-      const child = spawn('node', ['downscale.js'], {
-        stdio: ['pipe', 'pipe', 'pipe', 'ipc'], // Enable inter-process communication
-      });
-
       const pr = new Promise(resolve => {
+        const child = spawn('node', ['downscale.js'], {
+          stdio: ['pipe', 'pipe', 'pipe', 'ipc'], // Enable inter-process communication
+        });
+
         child.send({
           imageDir,
           outputDir,
