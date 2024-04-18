@@ -1,37 +1,37 @@
 import sharp from 'sharp';
 
+const longestSideSize = 1920;
+const targetQuality = 80;
+
 async function downscaleImage(props) {
-  const { imageDir, outputDir, targetWidth, targetHeight, targetQuality, imageChunk } = props;
+  const { imageDir, outputDir, imageChunk } = props;
 
   try {
     for (const imageName of imageChunk) {
       const imagePath = `${imageDir}/${imageName}`;
       const outputPath = `${outputDir}/${imageName}`;
-      const ext = imagePath.split('.').pop().toLowerCase();
+      // const ext = imagePath.split('.').pop().toLowerCase();
+      // const isJpeg = ext === 'jpeg' || ext === 'jpg';
+      // const isPng = ext === 'png';
 
-      const isJpeg = ext === 'jpeg' || ext === 'jpg';
-      const isPng = ext === 'png';
-
-      if (isJpeg) {
-        await sharp(imagePath)
-          .resize(targetWidth, targetHeight)
-          .jpeg({ quality: targetQuality })
-          .withMetadata()
-          .toFile(outputPath);
-      } else if (isPng) {
-        await sharp(imagePath)
-          .resize(targetWidth, targetHeight)
-          .png({ quality: targetQuality })
-          .withMetadata()
-          .toFile(outputPath);
-      } else if (ext === 'gif') {
-        await sharp(imagePath, {
-          animated: true,
-        })
-          .resize(targetWidth, targetHeight)
-          .withMetadata()
-          .toFile(outputPath);
+      const metadata = await sharp(imagePath).metadata();
+      // Determine the new dimensions while maintaining aspect ratio
+      const width = metadata.width;
+      const height = metadata.height;
+      let newWidth, newHeight;
+      if (width > height) {
+        newWidth = longestSideSize;
+        newHeight = Math.round(height * (longestSideSize / width));
+      } else {
+        newHeight = longestSideSize;
+        newWidth = Math.round(width * (longestSideSize / height));
       }
+
+      await sharp(imagePath)
+        .resize(newWidth, newHeight)
+        .jpeg({ quality: targetQuality })
+        .withMetadata()
+        .toFile(outputPath);
 
       process.send({ status: 'progress', imagePath });
     }

@@ -5,9 +5,6 @@ import { spawn } from 'child_process';
 const numCores = os.cpus().length;
 const imageDir = './input';
 const outputDir = './downscaled';
-const targetWidth = 1920;
-const targetHeight = 1080;
-const targetQuality = 80;
 
 async function main() {
   const t0 = performance.now();
@@ -42,9 +39,6 @@ async function main() {
         child.send({
           imageDir,
           outputDir,
-          targetWidth,
-          targetHeight,
-          targetQuality,
           imageChunk,
         });
 
